@@ -122,14 +122,16 @@ packageChaincode() {
 # installChaincode PEER ORG
 installChaincode() {
   ORG=$1
-  setGlobals $ORG
+  PEER_PORT=$2
+  PEER_NUM=$3
+  setPeerGlobals $ORG $PEER_PORT
   set -x
   peer lifecycle chaincode install ${CC_NAME}.tar.gz >&log.txt
   res=$?
   { set +x; } 2>/dev/null
   cat log.txt
-  verifyResult $res "Chaincode installation on peer0.org${ORG} has failed"
-  successln "Chaincode is installed on peer0.org${ORG}"
+  verifyResult $res "Chaincode installation on peer${PEER_NUM}.org${ORG} has failed"
+  successln "Chaincode is installed on peer${PEER_NUM}.org${ORG}"
 }
 
 # queryInstalled PEER ORG
@@ -285,11 +287,50 @@ chaincodeQuery() {
 ## package the chaincode
 packageChaincode
 
-## Install chaincode on peer0.org1 and peer0.org2
-infoln "Installing chaincode on peer0.org1..."
-installChaincode 1
+## Install chaincode on all peers
+infoln "Installing chaincode on org1 peers"
+counter=0
+port=7051
+while [ $counter -lt 4 ]
+do
+  infoln "Installing chaincode: peer${cnt}.org1"
+  installChaincode 1 $port $counter
+  port=$(($port + 100))
+  counter=$(($counter + 1))
+done
+
 infoln "Install chaincode on peer0.org2..."
-installChaincode 2
+counter=0
+port=9051
+while [ $counter -lt 4 ]
+do
+  infoln "Installing chaincode: peer${cnt}.org2"
+  installChaincode 2 $port $counter
+  port=$(($port + 100))
+  counter=$(($counter + 1))
+done
+
+infoln "Install chaincode on peer0.org3..."
+counter=0
+port=11051
+while [ $counter -lt 4 ]
+do
+  infoln "Installing chaincode: peer${cnt}.org3"
+  installChaincode 3 $port $counter
+  port=$(($port + 100))
+  counter=$(($counter + 1))
+done
+
+infoln "Install chaincode on peer0.org4..."
+counter=0
+port=12051
+while [ $counter -lt 4 ]
+do
+  infoln "Installing chaincode: peer${cnt}.org4"
+  installChaincode 4 $port $counter
+  port=$(($port + 100))
+  counter=$(($counter + 1))
+done
 
 ## query whether the chaincode is installed
 queryInstalled 1

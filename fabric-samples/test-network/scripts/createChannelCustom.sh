@@ -88,8 +88,8 @@ successln "Channel '$CHANNEL_NAME' created"
 
 ## Join all the peers to the channel
 infoln "Joining org1 peer to the channel..."
-counter=0
-port=7051
+local counter=0
+local port=7051
 while [ $counter -lt 4 ]
 do
   infoln "peer${counter}.org1"
@@ -99,8 +99,8 @@ do
 done
 
 infoln "Joining org2 peer to the channel..."
-counter=0
-port=9051
+local counter=0
+local port=9051
 while [ $counter -lt 4 ]
 do
   infoln "peer${counter}.org2"
@@ -110,8 +110,8 @@ do
 done
 
 infoln "Joining org3 peer to the channel..."
-counter=0
-port=11051
+local counter=0
+local port=11051
 while [ $counter -lt 4 ]
 do
   infoln "peer${counter}.org3"
@@ -121,8 +121,8 @@ do
 done
 
 infoln "Joining org4 peer to the channel..."
-counter=0
-port=12051
+local counter=0
+local port=12051
 while [ $counter -lt 4 ]
 do
   infoln "peer${counter}.org4"

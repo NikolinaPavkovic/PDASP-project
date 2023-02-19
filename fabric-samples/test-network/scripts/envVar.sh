@@ -17,6 +17,39 @@ export PEER0_ORG2_CA=${PWD}/organizations/peerOrganizations/org2.example.com/pee
 export PEER0_ORG3_CA=${PWD}/organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt
 export PEER0_ORG4_CA=${PWD}/organizations/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt
 
+setPeerGlobals() {
+  local USING_ORG=""
+  local PEER_PORT=$2
+  if [ -z "$OVERRIDE_ORG" ]; then
+    USING_ORG=$1
+  else
+    USING_ORG="${OVERRIDE_ORG}"
+  fi
+  infoln "Using organization ${USING_ORG}"
+
+  export CORE_PEER_LOCALMSPID="Org${USING_ORG}MSP"
+  if [ $USING_ORG -eq 1 ]; then
+    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG1_CA
+  elif [ $USING_ORG -eq 2 ]; then
+    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG2_CA
+  elif [ $USING_ORG -eq 3 ]; then
+    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG3_CA
+  elif [ $USING_ORG -eq 4 ]; then
+    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG3_CA
+  fi
+
+  export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org${USING_ORG}.example.com/users/Admin@org${USING_ORG}.example.com/msp
+  export CORE_PEER_ADDRESS=localhost:${PEER_PORT}
+
+  if [ $USING_ORG -gt 4 ]; then
+    errorln "ORG Unknown"
+  fi
+
+  if [ "$VERBOSE" == "true" ]; then
+    env | grep CORE
+  fi
+}
+
 # Set environment variables for the peer org
 setGlobals() {
   local USING_ORG=""
