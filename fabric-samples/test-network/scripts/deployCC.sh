@@ -293,40 +293,40 @@ counter=0
 port=7051
 while [ $counter -lt 4 ]
 do
-  infoln "Installing chaincode: peer${cnt}.org1"
+  infoln "Installing chaincode: peer${counter}.org1"
   installChaincode 1 $port $counter
   port=$(($port + 100))
   counter=$(($counter + 1))
 done
 
-infoln "Install chaincode on peer0.org2..."
+infoln "Install chaincode on org2 peers"
 counter=0
 port=9051
 while [ $counter -lt 4 ]
 do
-  infoln "Installing chaincode: peer${cnt}.org2"
+  infoln "Installing chaincode: peer${counter}.org2"
   installChaincode 2 $port $counter
   port=$(($port + 100))
   counter=$(($counter + 1))
 done
 
-infoln "Install chaincode on peer0.org3..."
+infoln "Install chaincode on org3 peers"
 counter=0
 port=11051
 while [ $counter -lt 4 ]
 do
-  infoln "Installing chaincode: peer${cnt}.org3"
+  infoln "Installing chaincode: peer${counter}.org3"
   installChaincode 3 $port $counter
   port=$(($port + 100))
   counter=$(($counter + 1))
 done
 
-infoln "Install chaincode on peer0.org4..."
+infoln "Install chaincode on org4 peers"
 counter=0
 port=12051
 while [ $counter -lt 4 ]
 do
-  infoln "Installing chaincode: peer${cnt}.org4"
+  infoln "Installing chaincode: peer${counter}.org4"
   installChaincode 4 $port $counter
   port=$(($port + 100))
   counter=$(($counter + 1))

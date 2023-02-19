@@ -35,7 +35,7 @@ setPeerGlobals() {
   elif [ $USING_ORG -eq 3 ]; then
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG3_CA
   elif [ $USING_ORG -eq 4 ]; then
-    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG3_CA
+    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG4_CA
   fi
 
   export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org${USING_ORG}.example.com/users/Admin@org${USING_ORG}.example.com/msp
