@@ -3,6 +3,7 @@
 function createOrg() {
   ORG="$1"
   PORT="$2"
+  NUM_OF_PEERS=1
 
   infoln "Enrolling the CA admin"
   mkdir -p organizations/peerOrganizations/org${1}.example.com/
@@ -28,10 +29,16 @@ function createOrg() {
     Certificate: cacerts/localhost-${2}-ca-org${1}.pem
     OrganizationalUnitIdentifier: orderer" >${PWD}/organizations/peerOrganizations/org${1}.example.com/msp/config.yaml
 
-  infoln "Registering peer0"
-  set -x
-  fabric-ca-client register --caname ca-org${1} --id.name peer0 --id.secret peer0pw --id.type peer --tls.certfiles ${PWD}/organizations/fabric-ca/org${1}/tls-cert.pem
-  { set +x; } 2>/dev/null
+
+  local counter=0
+  while [ $counter -lt $NUM_OF_PEERS ]
+  do
+    infoln "Registering peer${counter}"
+    set -x
+    fabric-ca-client register --caname ca-org${1} --id.name peer${counter} --id.secret peer${counter}pw --id.type peer --tls.certfiles ${PWD}/organizations/fabric-ca/org${1}/tls-cert.pem
+    { set +x; } 2>/dev/null
+    counter=$(($counter + 1))
+  done
 
   infoln "Registering user"
   set -x
@@ -43,30 +50,38 @@ function createOrg() {
   fabric-ca-client register --caname ca-org${1} --id.name org${1}admin --id.secret org${1}adminpw --id.type admin --tls.certfiles ${PWD}/organizations/fabric-ca/org${1}/tls-cert.pem
   { set +x; } 2>/dev/null
 
-  infoln "Generating the peer0 msp"
-  set -x
-  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:${2} --caname ca-org${1} -M ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/msp --csr.hosts peer0.org${1}.example.com --tls.certfiles ${PWD}/organizations/fabric-ca/org${1}/tls-cert.pem
-  { set +x; } 2>/dev/null
 
-  cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/msp/config.yaml
+  local counter=0
+  while [ $counter -lt $NUM_OF_PEERS ]
+  do
+    infoln "Generating the peer${counter} msp"
+    set -x
+    fabric-ca-client enroll -u https://peer${counter}:peer${counter}pw@localhost:${2} --caname ca-org${1} -M ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/msp --csr.hosts peer${counter}.org${1}.example.com --tls.certfiles ${PWD}/organizations/fabric-ca/org${1}/tls-cert.pem
+    { set +x; } 2>/dev/null
 
-  infoln "Generating the peer0-tls certificates"
-  set -x
-  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:${2} --caname ca-org${1} -M ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/tls --enrollment.profile tls --csr.hosts peer0.org${1}.example.com --csr.hosts localhost --tls.certfiles ${PWD}/organizations/fabric-ca/org${1}/tls-cert.pem
-  { set +x; } 2>/dev/null
+    cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/msp/config.yaml ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/msp/config.yaml
 
-  cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/tls/ca.crt
-  cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/tls/signcerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/tls/server.crt
-  cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/tls/keystore/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/tls/server.key
+    infoln "Generating the peer${counter}-tls certificates"
+    set -x
+    fabric-ca-client enroll -u https://peer${counter}:peer${counter}pw@localhost:${2} --caname ca-org${1} -M ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/tls --enrollment.profile tls --csr.hosts peer${counter}.org${1}.example.com --csr.hosts localhost --tls.certfiles ${PWD}/organizations/fabric-ca/org${1}/tls-cert.pem
+    { set +x; } 2>/dev/null
 
-  mkdir -p ${PWD}/organizations/peerOrganizations/org${1}.example.com/msp/tlscacerts
-  cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/msp/tlscacerts/ca.crt
+    cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/tls/ca.crt
+    cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/tls/signcerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/tls/server.crt
+    cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/tls/keystore/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/tls/server.key
 
-  mkdir -p ${PWD}/organizations/peerOrganizations/org${1}.example.com/tlsca
-  cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/tlsca/tlsca.org${1}.example.com-cert.pem
+    mkdir -p ${PWD}/organizations/peerOrganizations/org${1}.example.com/msp/tlscacerts
+    cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/msp/tlscacerts/ca.crt
 
-  mkdir -p ${PWD}/organizations/peerOrganizations/org${1}.example.com/ca
-  cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer0.org${1}.example.com/msp/cacerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/ca/ca.org${1}.example.com-cert.pem
+    mkdir -p ${PWD}/organizations/peerOrganizations/org${1}.example.com/tlsca
+    cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/tls/tlscacerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/tlsca/tlsca.org${1}.example.com-cert.pem
+
+    mkdir -p ${PWD}/organizations/peerOrganizations/org${1}.example.com/ca
+    cp ${PWD}/organizations/peerOrganizations/org${1}.example.com/peers/peer${counter}.org${1}.example.com/msp/cacerts/* ${PWD}/organizations/peerOrganizations/org${1}.example.com/ca/ca.org${1}.example.com-cert.pem
+
+    counter=$(($counter + 1))
+  done
+
 
   infoln "Generating the user msp"
   set -x
