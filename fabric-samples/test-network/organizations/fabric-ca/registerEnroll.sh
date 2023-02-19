@@ -3,7 +3,7 @@
 function createOrg() {
   ORG="$1"
   PORT="$2"
-  NUM_OF_PEERS=1
+  NUM_OF_PEERS=$3
 
   infoln "Enrolling the CA admin"
   mkdir -p organizations/peerOrganizations/org${1}.example.com/
