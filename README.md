@@ -9,3 +9,12 @@ then run following script:
 ./startFabric.sh
 ```
 
+### Start application
+Next step is to start the application which calls chaincode
+
+Go to folder <b>fabric-samples/car-application/go</b>
+
+then run following script:
+```bash
+./runfabcar.sh
+```
